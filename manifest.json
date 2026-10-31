@@ -1,7 +1,7 @@
 {
   "name": "Кофейня — Карта лояльности",
   "short_name": "Кофейня",
-  "start_url": "/",
+  "start_url": "/coffee-loyalty/",
   "display": "standalone",
   "background_color": "#6F4E37",
   "theme_color": "#6F4E37",
