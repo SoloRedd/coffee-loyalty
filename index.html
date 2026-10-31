@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#6F4E37">
   <title>Кофейня — Карта лояльности</title>
   <link rel="manifest" href="manifest.json">
-  <!-- Загружаем библиотеку с надежного CDN (Cloudflare) -->
+  <!-- Библиотека для QR -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -75,6 +75,22 @@
     }
     
     .phone-big { font-size: 20px; font-weight: 600; color: #6F4E37; letter-spacing: 1px; margin-top: 15px; }
+    
+    /* Стили для подсказки установки */
+    #installHint {
+      display: none;
+      background: #f9f5f0;
+      border: 1px solid #e0d6cc;
+      border-radius: 12px;
+      padding: 15px;
+      margin-top: 20px;
+      font-size: 13px;
+      color: #6F4E37;
+      text-align: left;
+      line-height: 1.5;
+    }
+    #installHint b { color: #4a3222; }
+
     .hint { font-size: 13px; color: #888; margin-top: 14px; line-height: 1.4; }
     .reset {
       margin-top: 18px;
@@ -128,6 +144,10 @@
 
       <div id="qrBox"></div>
       <div class="phone-big" id="phoneDisplay"></div>
+      
+      <!-- Блок для умной подсказки -->
+      <div id="installHint"></div>
+
       <p class="brightness-tip">Увеличьте яркость экрана для сканирования</p>
 
       <button class="reset" onclick="resetCard()">Изменить номер</button>
@@ -136,6 +156,7 @@
 
   <script>
     // === НАСТРОЙКА ===
+    // Вставьте сюда вашу ссылку из Google Apps Script
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw_Ex_WQCmqxzqHmLru9XRYYIlQaezEruxA_80_-mEgScrkFdOSN3V6O8u6v9kMQTpT/exec';
 
     // === ЛОГИКА ===
@@ -212,6 +233,29 @@
         colorLight: '#ffffff',
         correctLevel: QRCode.CorrectLevel.H
       });
+
+      // Показываем подсказку для установки
+      showInstallHint();
+    }
+
+    // === Умная подсказка для установки ===
+    function showInstallHint() {
+      // Проверяем, не запущено ли уже как приложение (на главном экране)
+      if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+        return; // Уже установлено, ничего не показываем
+      }
+
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      const hintBlock = document.getElementById('installHint');
+      
+      if (isIOS) {
+        hintBlock.innerHTML = '📱 <b>Сохранить карту на iPhone:</b><br>Нажмите кнопку <b>«Поделиться»</b> (квадрат со стрелкой вверх) внизу экрана и выберите <b>«На экран "Домой"»</b>.';
+        hintBlock.style.display = 'block';
+      } else {
+        // Для Android и других
+        hintBlock.innerHTML = '📱 <b>Сохранить карту на телефон:</b><br>Нажмите на <b>три точки</b> (или меню) в углу браузера и выберите <b>«Добавить на главный экран»</b> или <b>«Установить приложение»</b>.';
+        hintBlock.style.display = 'block';
+      }
     }
 
     function resetCard() {
@@ -222,6 +266,7 @@
       document.getElementById('regScreen').style.display = 'block';
       document.getElementById('phone').value = '';
       document.getElementById('name').value = '';
+      document.getElementById('installHint').style.display = 'none'; // Скрываем подсказку
     }
 
     // При загрузке проверяем сохраненный номер
