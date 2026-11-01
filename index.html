@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#6F4E37">
-  <title>Кофейня — Красный Соловей</title>
+  <title>Кофейня Красный Соловей</title>
   <link rel="manifest" href="manifest.json">
   <!-- Библиотека для QR -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -33,7 +33,7 @@
     h1 { font-size: 22px; margin-bottom: 6px; color: #6F4E37; }
     .sub { font-size: 14px; color: #888; margin-bottom: 22px; }
     label { display: block; text-align: left; font-size: 13px; color: #666; margin-bottom: 6px; margin-top: 14px; }
-    input {
+    input[type="text"], input[type="tel"] {
       width: 100%;
       padding: 14px 16px;
       font-size: 17px;
@@ -42,11 +42,36 @@
       outline: none;
       transition: border-color 0.2s;
     }
-    input:focus { border-color: #6F4E37; }
+    input[type="text"]:focus, input[type="tel"]:focus { border-color: #6F4E37; }
+    
+    /* Стили для галочки согласия */
+    .checkbox-group {
+      display: flex;
+      align-items: flex-start;
+      text-align: left;
+      margin-top: 18px;
+      margin-bottom: 15px;
+    }
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+      margin-top: 2px;
+      margin-right: 10px;
+      cursor: pointer;
+      transform: scale(1.2);
+    }
+    .checkbox-group label {
+      margin: 0;
+      font-size: 12px;
+      color: #666;
+      line-height: 1.3;
+      cursor: pointer;
+      font-weight: normal;
+    }
+
     button {
       width: 100%;
       padding: 16px;
-      margin-top: 20px;
+      margin-top: 5px;
       font-size: 17px;
       font-weight: 600;
       color: #fff;
@@ -54,10 +79,10 @@
       border: none;
       border-radius: 12px;
       cursor: pointer;
-      transition: opacity 0.2s;
+      transition: opacity 0.2s, background-color 0.2s;
     }
     button:active { opacity: 0.8; }
-    button:disabled { background: #ccc; }
+    button:disabled { background: #ccc; cursor: not-allowed; }
     
     #qrScreen { display: none; }
     
@@ -133,7 +158,13 @@
       <label for="phone">Номер телефона</label>
       <input type="tel" id="phone" placeholder="+7 (___) ___-__-__" autocomplete="tel" inputmode="tel" maxlength="18">
 
-      <button id="submitBtn" onclick="saveAndShow()">Получить карту</button>
+      <!-- Галочка согласия -->
+      <div class="checkbox-group">
+        <input type="checkbox" id="agreeCheckbox">
+        <label for="agreeCheckbox">Я согласен на обработку персональных данных</label>
+      </div>
+
+      <button id="submitBtn" onclick="saveAndShow()" disabled>Получить карту</button>
       <p class="hint">Номер нужен только для того, чтобы кассир мог найти вас в системе лояльности.</p>
     </div>
 
@@ -161,7 +192,16 @@
 
     // === ЛОГИКА ===
     
-    // 1. Маска для телефона
+    // 1. Логика галочки согласия
+    const agreeCheckbox = document.getElementById('agreeCheckbox');
+    const submitBtn = document.getElementById('submitBtn');
+
+    agreeCheckbox.addEventListener('change', function() {
+      // Если галочка стоит, кнопка становится активной (disabled = false)
+      submitBtn.disabled = !this.checked; 
+    });
+
+    // 2. Маска для телефона
     const phoneInput = document.getElementById('phone');
     phoneInput.addEventListener('input', function (e) {
       let input = e.target.value.replace(/\D/g, ''); 
@@ -183,6 +223,12 @@
     });
 
     function saveAndShow() {
+      // Проверка на случай обхода блокировки кнопки
+      if (!agreeCheckbox.checked) {
+        alert('Пожалуйста, согласитесь на обработку персональных данных');
+        return;
+      }
+
       const name = document.getElementById('name').value.trim();
       const phoneRaw = document.getElementById('phone').value.trim();
       const btn = document.getElementById('submitBtn');
@@ -267,6 +313,10 @@
       document.getElementById('phone').value = '';
       document.getElementById('name').value = '';
       document.getElementById('installHint').style.display = 'none'; // Скрываем подсказку
+      
+      // Сбрасываем галочку и блокируем кнопку обратно
+      agreeCheckbox.checked = false;
+      submitBtn.disabled = true;
     }
 
     // При загрузке проверяем сохраненный номер
