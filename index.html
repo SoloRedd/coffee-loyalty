@@ -6,12 +6,19 @@
   <meta name="theme-color" content="#6F4E37">
   <title>Кофейня Красный Соловей</title>
   <link rel="manifest" href="manifest.json">
+  
+  <!-- Красивые шрифты -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+  
   <!-- Библиотека для QR -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: #6F4E37;
       color: #fff;
       min-height: 100vh;
@@ -143,6 +150,71 @@
       vertical-align: middle;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* === СТИЛИ ДЛЯ БЛОКА С НОВИНКАМИ === */
+    .promo-section {
+      margin-top: 30px;
+      text-align: left;
+      border-top: 1px solid #e0d6cc;
+      padding-top: 20px;
+    }
+    .promo-section h3 {
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #999;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .promo-item {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 1px solid #f0f0f0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      border-radius: 16px;
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+    .promo-item img {
+      width: 85px;
+      height: 85px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-right: 15px;
+      flex-shrink: 0;
+    }
+    .promo-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    /* Красивое курсивное название */
+    .promo-title {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 18px;
+      font-weight: 600;
+      color: #6F4E37;
+      margin-bottom: 2px;
+      line-height: 1.2;
+    }
+    /* Цена */
+    .promo-price {
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: #000;
+      margin-bottom: 6px;
+    }
+    /* Мелкий текст описания */
+    .promo-desc {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      color: #888;
+      line-height: 1.4;
+    }
   </style>
 </head>
 <body>
@@ -182,12 +254,36 @@
       <p class="brightness-tip">Увеличьте яркость экрана для сканирования</p>
 
       <button class="reset" onclick="resetCard()">Изменить номер</button>
+
+      <!-- === БЛОК С НОВИНКАМИ === -->
+      <div class="promo-section">
+        <h3>Новинки меню</h3>
+        
+        <div class="promo-item">
+          <img src="promo/drink1.jpg" alt="Латте с лавандой">
+          <div class="promo-content">
+            <h4 class="promo-title">Латте с лавандой</h4>
+            <div class="promo-price">280 ₽</div>
+            <p class="promo-desc">Нежный цветочный вкус с мягким сливочным послевкусием.</p>
+          </div>
+        </div>
+
+        <div class="promo-item">
+          <img src="promo/drink2.jpg" alt="Раф с малиной">
+          <div class="promo-content">
+            <h4 class="promo-title">Раф с малиной</h4>
+            <div class="promo-price">320 ₽</div>
+            <p class="promo-desc">Яркий ягодный вкус на основе сливок и эспрессо.</p>
+          </div>
+        </div>
+      </div>
+      <!-- === КОНЕЦ БЛОКА С НОВИНКАМИ === -->
+
     </div>
   </div>
 
   <script>
     // === НАСТРОЙКА ===
-    // Вставьте сюда вашу ссылку из Google Apps Script
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw_Ex_WQCmqxzqHmLru9XRYYIlQaezEruxA_80_-mEgScrkFdOSN3V6O8u6v9kMQTpT/exec';
 
     // === ЛОГИКА ===
@@ -197,7 +293,6 @@
     const submitBtn = document.getElementById('submitBtn');
 
     agreeCheckbox.addEventListener('change', function() {
-      // Если галочка стоит, кнопка становится активной (disabled = false)
       submitBtn.disabled = !this.checked; 
     });
 
@@ -223,7 +318,6 @@
     });
 
     function saveAndShow() {
-      // Проверка на случай обхода блокировки кнопки
       if (!agreeCheckbox.checked) {
         alert('Пожалуйста, согласитесь на обработку персональных данных');
         return;
@@ -245,7 +339,6 @@
       btn.disabled = true;
       btn.innerHTML = '<span class="loader"></span> Сохраняем...';
 
-      // Отправляем в Google
       fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
@@ -268,9 +361,8 @@
       document.getElementById('phoneDisplay').textContent = phoneNumber;
 
       const qrBox = document.getElementById('qrBox');
-      qrBox.innerHTML = ''; // Очищаем контейнер
+      qrBox.innerHTML = ''; 
 
-      // Генерация QR-кода
       new QRCode(qrBox, {
         text: phoneNumber,
         width: 260,
@@ -280,15 +372,12 @@
         correctLevel: QRCode.CorrectLevel.H
       });
 
-      // Показываем подсказку для установки
       showInstallHint();
     }
 
-    // === Умная подсказка для установки ===
     function showInstallHint() {
-      // Проверяем, не запущено ли уже как приложение (на главном экране)
       if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-        return; // Уже установлено, ничего не показываем
+        return; 
       }
 
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
@@ -298,7 +387,6 @@
         hintBlock.innerHTML = '📱 <b>Сохранить карту на iPhone:</b><br>Нажмите кнопку <b>«Поделиться»</b> (квадрат со стрелкой вверх) внизу экрана и выберите <b>«На экран "Домой"»</b>.';
         hintBlock.style.display = 'block';
       } else {
-        // Для Android и других
         hintBlock.innerHTML = '📱 <b>Сохранить карту на телефон:</b><br>Нажмите на <b>три точки</b> (или меню) в углу браузера и выберите <b>«Добавить на главный экран»</b> или <b>«Установить приложение»</b>.';
         hintBlock.style.display = 'block';
       }
@@ -312,14 +400,12 @@
       document.getElementById('regScreen').style.display = 'block';
       document.getElementById('phone').value = '';
       document.getElementById('name').value = '';
-      document.getElementById('installHint').style.display = 'none'; // Скрываем подсказку
+      document.getElementById('installHint').style.display = 'none'; 
       
-      // Сбрасываем галочку и блокируем кнопку обратно
       agreeCheckbox.checked = false;
       submitBtn.disabled = true;
     }
 
-    // При загрузке проверяем сохраненный номер
     window.addEventListener('DOMContentLoaded', () => {
       const savedPhone = localStorage.getItem('loyalty_phone');
       if (savedPhone) {
